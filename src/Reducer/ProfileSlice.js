@@ -5,7 +5,8 @@ export const viewProfile = createAsyncThunk(
     'viewProfile',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get('/user/view-profile');
+            const response = await api.get('/api/profile/my-account');
+            console.log("profile response",response)
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {

@@ -34,6 +34,8 @@ import AddJobs from '../pages/AddJobs/AddJobs.jsx';
 import ApplicantsList from '../pages/AddJobs/ApplicantsList.jsx';
 import ManageCoupon from '../pages/ManageCoupon/ManageCoupon.jsx';
 import AddCoupon from '../pages/ManageCoupon/AddCoupon.jsx';
+import MyProfile from '../pages/MyProfile/MyProfile.jsx';
+import AddJobForm from '../pages/AddJobs/AddJobForm.jsx';
 
 
 const allRoutes = [
@@ -214,8 +216,13 @@ const allRoutes = [
         index: true,
         element: <AddJobs />,
       },
+      {
+        path: 'form',
+        element: <AddJobForm />,
+      },
     ],
   },
+
 
   {
     path: '/applicants-list',
@@ -330,6 +337,10 @@ const allRoutes = [
     ],
   },
 
+  {
+    path: '/profile',
+    element: <MyProfile />,
+  },
 
   {
     path: '*',

@@ -12,8 +12,12 @@ import { useSelector } from 'react-redux';
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const { profileDetail } = useSelector((state) => state.profile);
+    useEffect(() => {
+    dispatch(viewProfile())
+  }, (dispatch))
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
@@ -44,7 +48,7 @@ const DropdownUser = () => {
     return () => document.removeEventListener('keydown', keyHandler);
   });
 
-  const dispatch = useDispatch()
+  
   const handleLogout = () => {
     dispatch(logout())
     navigate("/");
@@ -72,12 +76,20 @@ const DropdownUser = () => {
           </span>
           <span className="block text-xs text-gray-400">
             {/* {parseUserName?.user_type} */}
-            Admin
+            {profileDetail?.data?.username}
           </span>
         </span>
 
-        <span className="h-8 w-8 rounded-full">
-          <img src={profileDetail?.data?.avatar ? profileDetail?.data?.avatar : UserOne} alt="User" />
+        <span className="h-8 w-8 rounded-full overflow-hidden">
+          <img
+            src={
+              profileDetail?.data?.avatar
+                ? profileDetail.data.avatar
+                : UserOne
+            }
+            alt="User"
+            className="w-full h-full object-cover"
+          />
         </span>
 
         <svg

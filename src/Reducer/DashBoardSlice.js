@@ -1,54 +1,95 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../store/Api";
 
-export const dashboardCards = createAsyncThunk(
-    'cards',
+// Dashboard Info Thunk
+export const dashboardInfo = createAsyncThunk(
+    "dashboardInfo",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get('/dashboard/counts');
+            const response = await api.get("/api/dashboard/info");
+
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
-                if (response?.data?.errors) {
-                    return rejectWithValue(response.data.errors);
-                } else {
-                    return rejectWithValue('Something went wrong.');
-                }
+                return rejectWithValue(
+                    response?.data?.errors || "Something went wrong."
+                );
             }
         } catch (err) {
             return rejectWithValue(err);
         }
     }
-)
-const initialState = {
-    loading: false,
-    error: null,
-    dashboardData: []
-}
-const DashBoardSlice = createSlice(
-    {
-        name: 'dashboards',
-        initialState,
-        reducers: {},
-        extraReducers: (builder) => {
-            builder.addCase(dashboardCards.pending, (state) => {
-                state.loading = true;
-            })
-                .addCase(dashboardCards.fulfilled, (state, { payload }) => {
-                    state.loading = false
-                    state.dashboardData = payload
-                    state.error = false
-                })
-                .addCase(dashboardCards.rejected, (state, { payload }) => {
-                    state.error = true;
-                    state.loading = false;
-                    state.message =
-                        payload !== undefined && payload.message
-                            ? payload.message
-                            : 'Something went wrong. Try again later.';
+);
 
-                })
+// Dashboard Cards Thunk
+export const dashboardCards = createAsyncThunk(
+    "cards",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await api.get("/dashboard/counts");
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                return rejectWithValue(
+                    response?.data?.errors || "Something went wrong."
+                );
+            }
+        } catch (err) {
+            return rejectWithValue(err);
         }
     }
-)
+);
+
+const initialState = {
+    infoLoading: false,
+    cardsLoading: false,
+    error: null,
+    message: null,
+    infoData: [],
+    dashboardData: [],
+};
+
+const DashBoardSlice = createSlice({
+    name: "dashboards",
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            //  Dashboard Cards
+            .addCase(dashboardCards.pending, (state) => {
+                state.cardsLoading = true;
+                state.error = null;
+            })
+            .addCase(dashboardCards.fulfilled, (state, { payload }) => {
+                state.cardsLoading = false;
+                state.dashboardData = payload;
+                state.error = false;
+            })
+            .addCase(dashboardCards.rejected, (state, { payload }) => {
+                state.cardsLoading = false;
+                state.error = true;
+                state.message =
+                    payload?.message || "Something went wrong. Try again later.";
+            })
+
+            //  Dashboard Info
+            .addCase(dashboardInfo.pending, (state) => {
+                state.infoLoading = true;
+                state.error = null;
+                state.message = null;
+            })
+            .addCase(dashboardInfo.fulfilled, (state, { payload }) => {
+                state.infoLoading = false;
+                state.infoData = payload;
+                state.error = false;
+            })
+            .addCase(dashboardInfo.rejected, (state, { payload }) => {
+                state.infoLoading = false;
+                state.error = true;
+                state.message =
+                    payload?.message || "Something went wrong. Try again later.";
+            });
+    },
+});
+
 export default DashBoardSlice.reducer;

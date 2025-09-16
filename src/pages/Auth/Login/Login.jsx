@@ -107,7 +107,7 @@ const Login = () => {
                       id="email"
                       className="bg-white border border-[#dfdfdf] text-[#888888] text-sm rounded-lg focus:ring-[#f1d9ff] focus:border-[#f1d9ff] block w-full py-4 px-3"
                       placeholder="Enter your Username or Email Id"
-                      {...register("username", { required: true })}
+                      {...register("email", { required: true })}
                     />
                     {errors.username && (
                       <small className="text-red-500">

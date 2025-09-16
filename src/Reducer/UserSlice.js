@@ -5,7 +5,7 @@ export const getUsers = createAsyncThunk(
     'getUsers',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get('/user/list');
+            const response = await api.get('/api/user-mange/list');
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -20,6 +20,27 @@ export const getUsers = createAsyncThunk(
         }
     }
 )
+// export const getUsers = createAsyncThunk(
+//     'getUsers',
+//     async (searchQuery = '', { rejectWithValue }) => {
+//         try {
+//             const response = await api.get(`/api/user-mange/list`, {
+//                 params: {
+//                     searchQuery: searchQuery 
+//                 }
+//             });
+
+//             if (response?.data?.status_code === 200) {
+//                 return response.data;
+//             } else {
+//                 return rejectWithValue(response?.data?.errors || 'Something went wrong.');
+//             }
+//         } catch (err) {
+//             return rejectWithValue(err);
+//         }
+//     }
+// );
+
 export const userActiveDeactive = createAsyncThunk(
     'userActiveDeactive',
     async (user_input, { rejectWithValue }) => {

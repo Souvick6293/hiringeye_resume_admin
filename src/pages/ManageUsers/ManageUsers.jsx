@@ -18,14 +18,19 @@ const ManageUsers = () => {
     dispatch(getUsers());
   }, []);
 
-  useEffect(() => {
+   useEffect(() => {
     if (userData?.data?.length) {
-      const mappedData = userData.data.map((user) => ({
+      const mappedData = userData.data.map((user, index) => ({
         id: user.id,
-        f_name: user.f_name,
-        l_name: user.l_name,
+        serial: index + 1,
+        fullname: user.fullname,
+        username: user.username,
         email: user.email,
-        status: user.status === 1,
+        organization: user.organization_name ?? "-",
+        user_type: user.signup_type_id === 1 ? "Individual" : "Organization",
+        status: user.is_active === 1,
+        resumes: user.resumes?.length ?? 0,
+        registration_date: new Date(user.created_at).toLocaleDateString(),
       }));
       setRowData(mappedData);
     }
@@ -48,13 +53,13 @@ const ManageUsers = () => {
   const columnDefs = [
     {
       headerName: "Serial No.",
-      field: "f_name",
+      field: "serial",
       sortable: true,
       filter: true,
     },
     {
       headerName: "User Name",
-      field: "l_name",
+      field: "username",
       sortable: true,
       filter: true,
     },

@@ -17,11 +17,12 @@ api.interceptors.request.use((req) => {
   if (formDataURL.includes(req.url)) {
     req.headers['Content-Type'] = 'multipart/form-data';
   }
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
-  }
-  if (domain) {
+   if (domain) {
     req.headers['Domain'] = domain;
+  }
+  req.headers['x-api-key'] = import.meta.env.VITE_API_KEY;
+  if(token){
+    req.headers.Authorization = `Bearer ${token}`
   }
   return req;
 });

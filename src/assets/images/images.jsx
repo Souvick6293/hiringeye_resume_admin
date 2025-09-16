@@ -58,6 +58,7 @@ import EconomicIcon from "../imagesource/Economic_icon.png";
 import visaIcon from "../imagesource/visa_icon.png";
 
 import user01 from "../imagesource/user/user-01.png";
+import myAvtar from "../imagesource/my-avtar.png";
 
 export {
   user01,
@@ -102,4 +103,5 @@ export {
   developerAI,
   qualityAnalystAI,
   shirt,
+  myAvtar
 };
