@@ -33,6 +33,7 @@ import CategorySlice from '../Reducer/CategorySlice'
 import RoleSlice from '../Reducer/RoleSlice';
 import UserSlice from '../Reducer/UserSlice';
 import AddAudioSlice from '../Reducer/AddAudioSlice'
+import JobSlice from '../Reducer/JobSlice'
 
 const store = configureStore({
   reducer: {
@@ -70,6 +71,7 @@ const store = configureStore({
     role: RoleSlice,
     user: UserSlice,
     audios: AddAudioSlice,
+    job: JobSlice,
   },
   devTools: import.meta.env.DEV,
 });

@@ -33,8 +33,8 @@ const MyProfile = () => {
   const profile = profileDetail.data;
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-[#c9c9c9] px-4">
-      <div className="max-w-2xl w-full bg-[#bdbdbd] rounded-2xl shadow-md p-6 relative">
+    <div className="min-h-screen flex justify-center items-center px-4">
+      <div className="max-w-2xl w-full bg-[#dcdae1] rounded-2xl shadow-md p-6 relative">
         
         <button
           onClick={() => navigate(-1)}

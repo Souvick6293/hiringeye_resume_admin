@@ -36,6 +36,7 @@ import ManageCoupon from '../pages/ManageCoupon/ManageCoupon.jsx';
 import AddCoupon from '../pages/ManageCoupon/AddCoupon.jsx';
 import MyProfile from '../pages/MyProfile/MyProfile.jsx';
 import AddJobForm from '../pages/AddJobs/AddJobForm.jsx';
+import EditJobForm from '../pages/AddJobs/EditJobForm .jsx';
 
 
 const allRoutes = [
@@ -219,6 +220,10 @@ const allRoutes = [
       {
         path: 'form',
         element: <AddJobForm />,
+      },
+      {
+        path: 'edit-job',
+        element: <EditJobForm />,
       },
     ],
   },
