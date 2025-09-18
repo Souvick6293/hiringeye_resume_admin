@@ -6,6 +6,8 @@ import { addJob } from "../../Reducer/JobSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { logo } from '../../assets/images/images';
 import { FaArrowLeft } from "react-icons/fa6";
+import { CgArrowLeft } from "react-icons/cg";
+import { useNavigate } from "react-router-dom";
 
 const AddJobForm = () => {
   const {
@@ -24,7 +26,7 @@ const AddJobForm = () => {
       responsibilities: "",
     },
   });
-
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const { loading, success, error } = useSelector((state) => state.job);
   const dispatch = useDispatch();
@@ -39,17 +41,26 @@ const AddJobForm = () => {
 
     // Map job type to backend-compatible string
     const jobTypeMap = {
-      "Full-Time": "Full-time",
-      "Part-Time": "Part-time",
+      "Full-time": "Full-time",
+      "Part-time": "Part-Time",
       "Internship": "Internship",
       "Temporary": "Temporary",
       "Contract": "Contract",
     };
 
+    // Take the first selected company size
+    const selectedCompanySize = data.company_size?.[0];
+    const companySizeValue = selectedCompanySize ? companySizeMap[selectedCompanySize] : 0;
+
+    // Take single selected job type
+    const selectedJobType = Array.isArray(data.job_type)
+      ? data.job_type.find(type => type && jobTypeMap[type])
+      : data.job_type;
+
     const formattedData = {
       ...data,
-      company_size: companySizeMap[data.company_size[0]],
-      job_type: jobTypeMap[data.job_type[0]],
+      company_size: companySizeValue,
+      job_type: selectedJobType ? jobTypeMap[selectedJobType] : "", // single string
       recruiter_email: data.recruitersEmailId,
     };
 
@@ -62,6 +73,8 @@ const AddJobForm = () => {
         .catch((err) => console.error("Job Add Failed", err));
     }
   };
+
+
 
   // const onSubmit = (data) => {
   //   if (currentStep < 3) {
@@ -91,16 +104,16 @@ const AddJobForm = () => {
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-md p-6">
         {/* Top Heading */}
-        <div className="flex items-center mb-6">
+        <div className="flex items-center">
           <button
             type="button"
-            disabled={currentStep === 1}
-            onClick={() => setCurrentStep((prev) => prev - 1)}
-            className="mr-3 text-gray-800 hover:text-black text-lg disabled:opacity-30 border p-1 border-gray-400 rounded "
+            onClick={() => navigate(-1)}
           >
-            <FaArrowLeft />
+            <span className="border border-[#A6A6A6] w-[34px] h-[34px] rounded-[5px] flex items-center justify-center">
+              <CgArrowLeft />
+            </span>
           </button>
-          <h2 className="text-2xl font-semibold">Add Job</h2>
+          <h2 className="text-2xl font-semibold ml-2">Add Job</h2>
         </div>
 
         <div className="flex gap-10">
@@ -185,41 +198,30 @@ const AddJobForm = () => {
 
                 {/* Job Type */}
                 <div>
-                  <label className="block text-purple-600 font-medium mb-1">
-                    Job Type <span className="text-red-500">*</span>
-                  </label>
+                  <label className="block text-purple-600 font-medium mb-1">Job Type *</label>
                   <Controller
                     name="job_type"
                     control={control}
-                    rules={{ required: "Select at least one job type" }}
+                    rules={{ required: "Select a job type" }}
                     render={({ field }) => (
                       <div className="flex flex-wrap gap-4">
-                        {["Full-time", "Part-time", "Internship", "Temporary", "Contract"].map(
-                          (type) => (
-                            <label key={type} className="flex items-center gap-2">
-                              <input
-                                type="checkbox"
-                                value={type}
-                                checked={field.value?.includes(type) || false}
-                                onChange={(e) => {
-                                  const newValue = e.target.checked
-                                    ? [...(field.value || []), type]
-                                    : field.value.filter((v) => v !== type);
-                                  field.onChange(newValue);
-                                }}
-                                className="accent-purple-600"
-                              />
-                              {type}
-                            </label>
-                          )
-                        )}
+                        {["Full-time", "Part-time", "Internship", "Temporary", "Contract"].map((type) => (
+                          <label key={type} className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              value={type}
+                              checked={field.value === type}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              className="accent-purple-600"
+                            />
+                            {type}
+                          </label>
+                        ))}
                       </div>
                     )}
                   />
-                  {errors.job_type && (
-                    <p className="text-red-500 text-sm">{errors.job_type.message}</p>
-                  )}
                 </div>
+
 
                 {/* Job Location */}
                 <div>
@@ -245,31 +247,25 @@ const AddJobForm = () => {
                   <Controller
                     name="company_size"
                     control={control}
-                    rules={{ required: "Select at least one company size" }}
+                    rules={{ required: "Select a company size" }}
                     render={({ field }) => (
                       <div className="flex flex-wrap gap-4">
-                        {["0 - 20 Employees", "50 - 100 Employees", "200 - 500 Employees"].map(
-                          (size) => (
-                            <label key={size} className="flex items-center gap-2">
-                              <input
-                                type="checkbox"
-                                value={size}
-                                checked={field.value?.includes(size) || false}
-                                onChange={(e) => {
-                                  const newValue = e.target.checked
-                                    ? [...(field.value || []), size]
-                                    : field.value.filter((v) => v !== size);
-                                  field.onChange(newValue);
-                                }}
-                                className="accent-purple-600"
-                              />
-                              {size}
-                            </label>
-                          )
-                        )}
+                        {["0 - 20 Employees", "50 - 100 Employees", "200 - 500 Employees"].map((size) => (
+                          <label key={size} className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              value={size}
+                              checked={field.value === size}
+                              onChange={() => field.onChange(size)}
+                              className="accent-purple-600"
+                            />
+                            {size}
+                          </label>
+                        ))}
                       </div>
                     )}
                   />
+
                   {errors.company_size && (
                     <p className="text-red-500 text-sm mt-1">{errors.company_size.message}</p>
                   )}

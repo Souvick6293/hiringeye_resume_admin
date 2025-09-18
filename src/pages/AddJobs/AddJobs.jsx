@@ -2,25 +2,35 @@ import React, { useEffect } from "react";
 import { BsFillPlusCircleFill } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchJobs, setPage } from "../../Reducer/jobSlice";
-
+import { fetchJobs, setPage, toggleJobActivation, toggleLocalStatus } from "../../Reducer/JobSlice";
 import small_logo_3 from "../../assets/imagesource/small_logo_3.png";
 
 const AddJobs = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  // Get state from Redux
   const { jobs, loading, pagination } = useSelector((state) => state.job);
 
-  // Fetch jobs when page changes
   useEffect(() => {
     dispatch(fetchJobs({ page: pagination.page, limit: pagination.limit }));
   }, [dispatch, pagination.page, pagination.limit]);
 
+  // In your component
+  const handleToggleStatus = (job) => {
+    dispatch(toggleLocalStatus(job.id));
+    dispatch(toggleJobActivation({
+      id: job.id,
+      currentStatus: job.is_active === 1 ? 0 : 1
+    }));
+  };
+
+
+
+
+
+
   return (
     <div className="pb-10">
-      {/* Header Section */}
+      {/* Header */}
       <div className="flex justify-between items-center pt-1 mb-6">
         <div>
           <h2 className="text-[30px] leading-[30px] text-[#151515] font-semibold pb-3">
@@ -41,14 +51,14 @@ const AddJobs = () => {
         </div>
       </div>
 
-      {/* Loading State */}
+      {/* Loading */}
       {loading && <p className="text-center text-gray-600">Loading jobs...</p>}
 
       {/* Jobs Grid */}
       {!loading && jobs.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {jobs.map((job) => (
-            <div key={job.id} className="bg-white rounded-[10px] p-9 shadow-sm">
+            <div key={job.id} className="bg-white rounded-[10px] p-6 shadow-sm">
               <img src={small_logo_3} alt="small_logo_3" className="mb-3" />
               <h3 className="text-[24px] text-[#6326CB] font-semibold pb-2">
                 {job.job_role}{" "}
@@ -58,12 +68,41 @@ const AddJobs = () => {
                   </Link>
                 </span>
               </h3>
+
               <div
                 className="text-[#6C6C6C] text-[16px] pb-4 prose"
                 dangerouslySetInnerHTML={{ __html: job.job_description }}
               />
-              <button className="bg-[#6326CB] hover:bg-black w-full rounded-[7px] text-[#ffffff] text-[16px] leading-[45px]"
-                onClick={() => navigate("edit-job")}
+
+              {/* Toggle Button */}
+              <label className="inline-flex items-center cursor-pointer w-full justify-center mb-3">
+                <input
+                  type="checkbox"
+                  checked={job.is_active === 1}
+                  onChange={() => handleToggleStatus(job)}
+                  className="sr-only peer"
+                />
+                <div
+                  className={`relative w-12 h-6 bg-gray-300 rounded-full transition-colors
+    ${job.is_active === 1 ? "bg-green-500" : "bg-gray-300"}`}
+                >
+                  <span
+                    className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform 
+      ${job.is_active === 1 ? "translate-x-6" : ""}`}
+                  ></span>
+                </div>
+                <span className="ml-3 text-sm font-medium text-gray-700">
+                  {job.is_active === 1 ? "Active" : "Inactive"}
+                </span>
+
+              </label>
+
+
+
+              {/* Edit Button */}
+              <button
+                className="bg-[#6326CB] hover:bg-black w-full rounded-[7px] text-[#ffffff] text-[16px] leading-[45px]"
+                onClick={() => navigate(`edit-job/${job.id}`)}
               >
                 Edit Job Details
               </button>

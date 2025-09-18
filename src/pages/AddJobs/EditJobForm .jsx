@@ -1,23 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useSelector, useDispatch } from "react-redux";
-import { editJob } from "../../Reducer/JobSlice"; // create this thunk
-import { logo } from '../../assets/images/images';
-import { FaArrowLeft } from "react-icons/fa6";
+import { editJob, fetchJobDetail } from "../../Reducer/JobSlice";
+import { logo } from "../../assets/images/images";
+import { FaArrowLeft } from "react-icons/fa";
+import { useParams, useNavigate } from "react-router-dom";
+import { CgArrowLeft } from "react-icons/cg";
 
-const EditJobForm = ({ jobData }) => {
+const EditJobForm = () => {
     const dispatch = useDispatch();
-    const { loading, success, error } = useSelector((state) => state.job);
+    const navigate = useNavigate();
+    const { id } = useParams();
+    const { jobDetail, loading } = useSelector((state) => state.job);
     const [currentStep, setCurrentStep] = useState(1);
 
-    const { register, handleSubmit, control, watch, reset, formState: { errors }, setError } = useForm({
+    const {
+        register,
+        handleSubmit,
+        control,
+        watch,
+        reset,
+        formState: { errors },
+        setError,
+    } = useForm({
         defaultValues: {
             job_role: "",
             job_description: "",
-            job_type: [],
-            company_size: [],
+            job_type: "",
+            company_size: "",
             location: "",
             max_qualification: "",
             preferred_qualification: "",
@@ -25,15 +37,43 @@ const EditJobForm = ({ jobData }) => {
             recruitersEmailId: "",
             company_name: "",
             company_logo: "",
-            ...jobData, // load existing job data
-        }
+        },
     });
 
     useEffect(() => {
-        if (jobData) {
-            reset(jobData);
+        dispatch(fetchJobDetail(id));
+    }, [dispatch, id]);
+
+    // Prefill form when jobDetail is loaded
+    useEffect(() => {
+        if (jobDetail) {
+            const companySizeLabelMap = {
+                20: "0 - 20 Employees",
+                100: "50 - 100 Employees",
+                500: "200 - 500 Employees",
+            };
+
+            const jobTypeLabels = ["Full-time", "Part-time", "Internship", "Temporary", "Contract"];
+
+            let prefilledJobType = "";
+            if (jobDetail.job_type) {
+                if (Array.isArray(jobDetail.job_type)) {
+                    prefilledJobType = jobDetail.job_type.find((type) => jobTypeLabels.includes(type)) || "";
+                } else if (jobTypeLabels.includes(jobDetail.job_type)) {
+                    prefilledJobType = jobDetail.job_type;
+                }
+            }
+
+            const prefilledCompanySize = jobDetail.company_size ? companySizeLabelMap[jobDetail.company_size] : "";
+
+            reset({
+                ...jobDetail,
+                company_size: prefilledCompanySize,
+                job_type: prefilledJobType,
+                recruitersEmailId: jobDetail.recruiter_email || "",
+            });
         }
-    }, [jobData, reset]);
+    }, [jobDetail, reset]);
 
     const modules = {
         toolbar: [
@@ -48,40 +88,41 @@ const EditJobForm = ({ jobData }) => {
     const watchAllFields = watch();
 
     const onSubmit = async (data) => {
-        // Map company size & job type to backend compatible
         const companySizeMap = {
             "0 - 20 Employees": 20,
             "50 - 100 Employees": 100,
             "200 - 500 Employees": 500,
         };
 
-        const jobTypeMap = {
-            "Full-time": "Full-time",
-            "Part-time": "Part-time",
-            "Internship": "Internship",
-            "Temporary": "Temporary",
-            "Contract": "Contract",
-        };
-
         const formattedData = {
-            ...data,
-            company_size: companySizeMap[data.company_size[0]] || 0,
-            job_type: jobTypeMap[data.job_type[0]] || "",
-            recruiter_email: data.recruitersEmailId,
+            job_id: Number(id),
+            job_role: data.job_role?.trim() || "",
+            job_description: data.job_description?.trim() || "",
+            location: data.location?.trim() || "",
+            company_name: data.company_name?.trim() || "",
+            company_size: companySizeMap[data.company_size] || 0,
+            job_type: data.job_type || "",
+            recruiter_email: data.recruitersEmailId?.trim() || "",
+            max_qualification: data.max_qualification?.trim() || "",
+            preferred_qualification: data.preferred_qualification?.trim() || "",
+            responsibilities: data.responsibilities?.trim() || "",
+            company_logo: data.company_logo || "",
         };
 
         if (currentStep < 3) {
-            setCurrentStep(prev => prev + 1);
+            setCurrentStep((prev) => prev + 1);
             return;
         }
 
         try {
-            await dispatch(editJob({ id: jobData.id, ...formattedData })).unwrap();
+            await dispatch(editJob({ jobId: id, jobData: formattedData })).unwrap();
             alert("Job updated successfully!");
+            navigate("/add-jobs");
         } catch (err) {
-            if (err?.fields) {
-                Object.keys(err.fields).forEach((field) => {
-                    setError(field, { type: "server", message: err.fields[field] });
+            console.error("API Error: ", err);
+            if (err?.data) {
+                err.data.forEach((fieldError) => {
+                    setError(fieldError.field, { type: "server", message: fieldError.message });
                 });
             } else {
                 alert(err?.message || "Something went wrong while updating the job");
@@ -89,20 +130,24 @@ const EditJobForm = ({ jobData }) => {
         }
     };
 
+    if (loading && !jobDetail) return <p className="text-center py-6">Loading job details...</p>;
+    if (!jobDetail) return <p className="text-center py-6 text-red-500">Job not found!</p>;
+
     return (
         <div className="bg-gray-50 min-h-screen">
             <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-md p-6">
                 {/* Top Heading */}
-                <div className="flex items-center mb-6">
+                {/* Top Heading */}
+                <div className="flex items-center">
                     <button
                         type="button"
-                        disabled={currentStep === 1}
-                        onClick={() => setCurrentStep(prev => prev - 1)}
-                        className="mr-3 text-gray-800 hover:text-black text-lg disabled:opacity-30 border p-1 border-gray-400 rounded "
+                        onClick={() => navigate(-1)}
                     >
-                        <FaArrowLeft />
+                        <span className="border border-[#A6A6A6] w-[34px] h-[34px] rounded-[5px] flex items-center justify-center">
+                            <CgArrowLeft />
+                        </span>
                     </button>
-                    <h2 className="text-2xl font-semibold">Edit Job</h2>
+                    <h2 className="text-2xl font-semibold ml-2">Edit Job</h2>
                 </div>
 
                 <div className="flex gap-10">
@@ -112,15 +157,14 @@ const EditJobForm = ({ jobData }) => {
                             const stepNumber = index + 1;
                             const isCompleted = stepNumber < currentStep;
                             const isActive = stepNumber === currentStep;
-
                             return (
                                 <div key={step} className="flex flex-col items-center mb-6">
                                     <div
                                         className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold border-2 ${isCompleted
-                                            ? "bg-purple-600 text-white border-purple-600"
-                                            : isActive
-                                                ? "border-purple-600 text-purple-600"
-                                                : "border-gray-300 text-gray-400"
+                                                ? "bg-purple-600 text-white border-purple-600"
+                                                : isActive
+                                                    ? "border-purple-600 text-purple-600"
+                                                    : "border-gray-300 text-gray-400"
                                             }`}
                                     >
                                         {stepNumber}
@@ -141,6 +185,7 @@ const EditJobForm = ({ jobData }) => {
                         {/* Step 1 */}
                         {currentStep === 1 && (
                             <>
+                                {/* Job Role */}
                                 <div>
                                     <label className="block text-purple-600 font-medium mb-1">
                                         Job Role <span className="text-red-500">*</span>
@@ -151,11 +196,10 @@ const EditJobForm = ({ jobData }) => {
                                         className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                                         placeholder="Add Job Role"
                                     />
-                                    {errors.job_role && (
-                                        <p className="text-red-500 text-sm">{errors.job_role.message}</p>
-                                    )}
+                                    {errors.job_role && <p className="text-red-500 text-sm">{errors.job_role.message}</p>}
                                 </div>
 
+                                {/* Job Description */}
                                 <div>
                                     <label className="block text-purple-600 font-medium mb-1">
                                         Job Description <span className="text-red-500">*</span>
@@ -166,6 +210,7 @@ const EditJobForm = ({ jobData }) => {
                                         rules={{ required: "Job Description is required" }}
                                         render={({ field }) => (
                                             <ReactQuill
+                                                ref={field.ref}
                                                 value={field.value}
                                                 onChange={field.onChange}
                                                 modules={modules}
@@ -175,9 +220,7 @@ const EditJobForm = ({ jobData }) => {
                                         )}
                                     />
                                     {errors.job_description && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.job_description.message}
-                                        </p>
+                                        <p className="text-red-500 text-sm mt-1">{errors.job_description.message}</p>
                                     )}
                                 </div>
 
@@ -189,22 +232,17 @@ const EditJobForm = ({ jobData }) => {
                                     <Controller
                                         name="job_type"
                                         control={control}
-                                        rules={{ required: "Select at least one job type" }}
+                                        rules={{ required: "Select a job type" }}
                                         render={({ field }) => (
                                             <div className="flex flex-wrap gap-4">
                                                 {["Full-time", "Part-time", "Internship", "Temporary", "Contract"].map(
                                                     (type) => (
                                                         <label key={type} className="flex items-center gap-2">
                                                             <input
-                                                                type="checkbox"
+                                                                type="radio"
                                                                 value={type}
-                                                                checked={field.value?.includes(type) || false}
-                                                                onChange={(e) => {
-                                                                    const newValue = e.target.checked
-                                                                        ? [...(field.value || []), type]
-                                                                        : field.value.filter((v) => v !== type);
-                                                                    field.onChange(newValue);
-                                                                }}
+                                                                checked={field.value === type}
+                                                                onChange={() => field.onChange(type)}
                                                                 className="accent-purple-600"
                                                             />
                                                             {type}
@@ -214,9 +252,7 @@ const EditJobForm = ({ jobData }) => {
                                             </div>
                                         )}
                                     />
-                                    {errors.job_type && (
-                                        <p className="text-red-500 text-sm">{errors.job_type.message}</p>
-                                    )}
+                                    {errors.job_type && <p className="text-red-500 text-sm">{errors.job_type.message}</p>}
                                 </div>
 
                                 {/* Job Location */}
@@ -243,22 +279,17 @@ const EditJobForm = ({ jobData }) => {
                                     <Controller
                                         name="company_size"
                                         control={control}
-                                        rules={{ required: "Select at least one company size" }}
+                                        rules={{ required: "Select a company size" }}
                                         render={({ field }) => (
                                             <div className="flex flex-wrap gap-4">
                                                 {["0 - 20 Employees", "50 - 100 Employees", "200 - 500 Employees"].map(
                                                     (size) => (
                                                         <label key={size} className="flex items-center gap-2">
                                                             <input
-                                                                type="checkbox"
+                                                                type="radio"
                                                                 value={size}
-                                                                checked={field.value?.includes(size) || false}
-                                                                onChange={(e) => {
-                                                                    const newValue = e.target.checked
-                                                                        ? [...(field.value || []), size]
-                                                                        : field.value.filter((v) => v !== size);
-                                                                    field.onChange(newValue);
-                                                                }}
+                                                                checked={field.value === size}
+                                                                onChange={() => field.onChange(size)}
                                                                 className="accent-purple-600"
                                                             />
                                                             {size}
@@ -278,6 +309,7 @@ const EditJobForm = ({ jobData }) => {
                         {/* Step 2 */}
                         {currentStep === 2 && (
                             <>
+                                {/* Maximum Qualification */}
                                 <div>
                                     <label className="block text-purple-600 font-medium mb-1">
                                         Maximum Qualification <span className="text-red-500">*</span>
@@ -288,6 +320,7 @@ const EditJobForm = ({ jobData }) => {
                                         rules={{ required: "Maximum Qualification is required" }}
                                         render={({ field }) => (
                                             <ReactQuill
+                                                ref={field.ref}
                                                 value={field.value}
                                                 onChange={field.onChange}
                                                 modules={modules}
@@ -297,12 +330,11 @@ const EditJobForm = ({ jobData }) => {
                                         )}
                                     />
                                     {errors.max_qualification && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.max_qualification.message}
-                                        </p>
+                                        <p className="text-red-500 text-sm mt-1">{errors.max_qualification.message}</p>
                                     )}
                                 </div>
 
+                                {/* Preferred Qualification */}
                                 <div>
                                     <label className="block text-purple-600 font-medium mb-1">
                                         Preferred Qualification <span className="text-red-500">*</span>
@@ -313,6 +345,7 @@ const EditJobForm = ({ jobData }) => {
                                         rules={{ required: "Preferred Qualification is required" }}
                                         render={({ field }) => (
                                             <ReactQuill
+                                                ref={field.ref}
                                                 value={field.value}
                                                 onChange={field.onChange}
                                                 modules={modules}
@@ -322,12 +355,11 @@ const EditJobForm = ({ jobData }) => {
                                         )}
                                     />
                                     {errors.preferred_qualification && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.preferred_qualification.message}
-                                        </p>
+                                        <p className="text-red-500 text-sm mt-1">{errors.preferred_qualification.message}</p>
                                     )}
                                 </div>
 
+                                {/* Responsibilities */}
                                 <div>
                                     <label className="block text-purple-600 font-medium mb-1">
                                         Responsibilities <span className="text-red-500">*</span>
@@ -338,6 +370,7 @@ const EditJobForm = ({ jobData }) => {
                                         rules={{ required: "Responsibilities is required" }}
                                         render={({ field }) => (
                                             <ReactQuill
+                                                ref={field.ref}
                                                 value={field.value}
                                                 onChange={field.onChange}
                                                 modules={modules}
@@ -347,12 +380,11 @@ const EditJobForm = ({ jobData }) => {
                                         )}
                                     />
                                     {errors.responsibilities && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.responsibilities.message}
-                                        </p>
+                                        <p className="text-red-500 text-sm mt-1">{errors.responsibilities.message}</p>
                                     )}
                                 </div>
 
+                                {/* Recruiter Email */}
                                 <div>
                                     <label className="block text-purple-600 font-medium mb-1">
                                         Recruiters Email Id <span className="text-red-500">*</span>
@@ -366,15 +398,13 @@ const EditJobForm = ({ jobData }) => {
                                         placeholder="Choose recruiters Email Id"
                                     />
                                     {errors.recruitersEmailId && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.recruitersEmailId.message}
-                                        </p>
+                                        <p className="text-red-500 text-sm mt-1">{errors.recruitersEmailId.message}</p>
                                     )}
                                 </div>
                             </>
                         )}
 
-                        {/* Step 3 */}
+                        {/* Step 3 - Review */}
                         {currentStep === 3 && (
                             <div className="text-left">
                                 <h3 className="text-2xl font-semibold text-purple-700 mb-3 text-center">
@@ -387,7 +417,7 @@ const EditJobForm = ({ jobData }) => {
                                         <img
                                             src={watchAllFields.company_logo || logo}
                                             alt="Company Logo"
-                                            className="object-cover rounded border  border-gray-500/50  bg-[#fff] p-6"
+                                            className="object-cover rounded border border-gray-500/50 bg-[#fff] p-6"
                                         />
                                         <div>
                                             <h4 className="text-xl font-bold">{watchAllFields.company_name || "Hiring Eye"}</h4>
@@ -411,20 +441,22 @@ const EditJobForm = ({ jobData }) => {
                                             <div>
                                                 <h4 className="text-lg font-semibold">{watchAllFields.job_role}</h4>
                                                 <div className="mt-1">
-                                                    <h4 className="text-gray-600 text-sm pb-2"><b className="text-[#000]">Hiring Eye: </b>{watchAllFields.location}</h4>
-                                                    <h4 className="text-gray-600 text-sm"><b className="text-[#000]">Job Type: </b>{watchAllFields.job_type}</h4>
+                                                    <h4 className="text-gray-600 text-sm pb-2">
+                                                        <b className="text-[#000]">Location: </b>{watchAllFields.location}
+                                                    </h4>
+                                                    <h4 className="text-gray-600 text-sm">
+                                                        <b className="text-[#000]">Job Type: </b>{watchAllFields.job_type}
+                                                    </h4>
                                                 </div>
                                             </div>
                                             <div>
-                                                <h4 className="text-lg font-semibold">Minimum Qualification</h4>
+                                                <h4 className="text-lg font-semibold">Maximum Qualification</h4>
                                                 <div className="text-gray-600 text-sm" dangerouslySetInnerHTML={{ __html: watchAllFields.max_qualification }} />
-
                                             </div>
                                             <div>
                                                 <h4 className="text-lg font-semibold">Preferred Qualification</h4>
                                                 <div className="text-gray-600 text-sm" dangerouslySetInnerHTML={{ __html: watchAllFields.preferred_qualification }} />
                                             </div>
-
                                         </div>
 
                                         <div className="w-1/2">
@@ -432,7 +464,6 @@ const EditJobForm = ({ jobData }) => {
                                             <div className="text-gray-600 text-sm" dangerouslySetInnerHTML={{ __html: watchAllFields.responsibilities }} />
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         )}
@@ -442,7 +473,7 @@ const EditJobForm = ({ jobData }) => {
                                 <button
                                     type="button"
                                     disabled={currentStep === 1}
-                                    onClick={() => setCurrentStep(prev => prev - 1)}
+                                    onClick={() => setCurrentStep((prev) => prev - 1)}
                                     className="px-6 py-2 border rounded-lg text-gray-700 bg-gray-300 hover:bg-gray-200 transition"
                                 >
                                     Back

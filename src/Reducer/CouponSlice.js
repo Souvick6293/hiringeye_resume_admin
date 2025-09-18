@@ -5,9 +5,9 @@ import errorHandler from '../store/ErrorHandler';
 // Fetch Coupons List
 export const getCouponList = createAsyncThunk(
   'coupon/get-all-coupon',
-  async (userInput, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await api.post('coupon/get-all-coupons', userInput);
+      const response = await api.get(`/api/coupon-manage/list?page=${page}&limit=${limit}`);
       if (response?.data?.status_code === 200) {
         return response?.data;
       } else {
@@ -25,7 +25,7 @@ export const createCoupon = createAsyncThunk(
   'coupon/create-coupon',
   async (userInput, { rejectWithValue }) => {
     try {
-      const response = await api.post('/coupon/create-coupon', userInput);
+      const response = await api.post('/api/coupon-manage/add', userInput);
       if (response?.data?.status_code === 201) {
         return response?.data;
       } else {
@@ -145,14 +145,24 @@ const initialState = {
   productDropDownList: [],
   singleCoupon: {},
   active_inactive: {},
-  validate:""
+  validate: "",
+  pagination: {
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+    totalItems: 0,
+  }
 };
 
 // Reducer
 const CouponSlice = createSlice({
   name: 'coupon',
   initialState,
-  reducers: {},
+  reducers: {
+    setPage: (state, action) => {
+      state.pagination.page = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getCouponList.pending, (state) => {
@@ -164,12 +174,19 @@ const CouponSlice = createSlice({
       .addCase(getCouponList.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.error = null;
-        state.message = state.message =
+        state.message =
           payload !== undefined && payload.message
             ? payload.message
             : 'Something went wrong. Try again later.';
-        state.couponList = payload;
+        state.couponList = payload?.data || [];
+        state.pagination = {
+          totalPages: payload?.pagination?.total_pages || 1,
+          totalItems: payload?.pagination?.total_count || 0,
+          currentPage: payload?.pagination?.current_page || 1,
+          limit: payload?.pagination?.limit || 10,
+        };
       })
+
       .addCase(getCouponList.rejected, (state, payload) => {
         state.loading = false;
         state.error = true;
@@ -179,106 +196,106 @@ const CouponSlice = createSlice({
             : 'Something went wrong. Try again later.';
         state.couponList = [];
       })
-      .addCase(createCoupon.pending, (state) => {
-        state.loading = true
-      })
-      .addCase(createCoupon.fulfilled, (state, { payload }) => {
-        // console.log("Payload", payload);
-        state.loading = false
-        state.message = payload
-        state.error = null
-      })
-      .addCase(createCoupon.rejected, (state, { payload }) => {
-        state.loading = false;
-        state.error = true;
-        state.message =
-          payload !== undefined && payload.message
-            ? payload.message
-            : 'Something went wrong. Try again later.';
-      })
-      .addCase(getAllCouponProduct.pending, (state) => {
-        state.loading = true
-      })
-      .addCase(getAllCouponProduct.fulfilled, (state, { payload }) => {
-        state.loading = false
-        state.productDropDownList = payload
-        state.error = null
-      })
-      .addCase(getAllCouponProduct.rejected, (state, { payload }) => {
-        state.loading = false;
-        state.error = true;
-        state.message =
-          payload !== undefined && payload.message
-            ? payload.message
-            : 'Something went wrong. Try again later.';
-      })
-      .addCase(getSingleCoupon.pending, (state) => {
-        state.loading = true
-      })
-      .addCase(getSingleCoupon.fulfilled, (state, { payload }) => {
-        state.loading = false
-        state.singleCoupon = payload
-        state.error = false
-      })
-      .addCase(getSingleCoupon.rejected, (state, { payload }) => {
-        state.loading = false;
-        state.error = true;
-        state.message =
-          payload !== undefined && payload.message
-            ? payload.message
-            : 'Something went wrong. Try again later.';
-      })
-      .addCase(updateCoupon.pending, (state) => {
-        state.loading = true
-      })
-      .addCase(updateCoupon.fulfilled, (state, { payload }) => {
-        state.loading = false
-        state.message = payload
-        state.error = false
-      })
-      .addCase(updateCoupon.rejected, (state, { payload }) => {
-        state.loading = false;
-        state.error = true;
-        state.message =
-          payload !== undefined && payload.message
-            ? payload.message
-            : 'Something went wrong. Try again later.';
-      })
-      .addCase(couponActiveDeactive.pending, (state) => {
-        state.loading = true
-      })
-      .addCase(couponActiveDeactive.fulfilled, (state, { payload }) => {
-        state.loading = false
-        state.active_inactive = payload
-      })
-      .addCase(couponActiveDeactive.rejected, (state, { payload }) => {
-        state.loading = false;
-        state.error = true;
-        state.message =
-          payload !== undefined && payload.message
-            ? payload.message
-            : 'Something went wrong. Try again later.';
-      })
-      .addCase(couponValidate.pending,(state)=>{
-        state.loading=true
-      })
-      .addCase(couponValidate.fulfilled,(state,{payload})=>{
-        state.loading=false
-        state.validate=payload
-        state.error=false
-      })
-      .addCase(couponValidate.rejected,(state,{payload})=>{
-         state.loading = false;
-        state.error = true;
-        state.message =
-          payload !== undefined && payload.message
-            ? payload.message
-            : 'Something went wrong. Try again later.';
-      })
+    .addCase(createCoupon.pending, (state) => {
+      state.loading = true
+    })
+    .addCase(createCoupon.fulfilled, (state, { payload }) => {
+      // console.log("Payload", payload);
+      state.loading = false
+      state.message = payload
+      state.error = null
+    })
+    .addCase(createCoupon.rejected, (state, { payload }) => {
+      state.loading = false;
+      state.error = true;
+      state.message =
+        payload !== undefined && payload.message
+          ? payload.message
+          : 'Something went wrong. Try again later.';
+    })
+    .addCase(getAllCouponProduct.pending, (state) => {
+      state.loading = true
+    })
+    .addCase(getAllCouponProduct.fulfilled, (state, { payload }) => {
+      state.loading = false
+      state.productDropDownList = payload
+      state.error = null
+    })
+    .addCase(getAllCouponProduct.rejected, (state, { payload }) => {
+      state.loading = false;
+      state.error = true;
+      state.message =
+        payload !== undefined && payload.message
+          ? payload.message
+          : 'Something went wrong. Try again later.';
+    })
+    .addCase(getSingleCoupon.pending, (state) => {
+      state.loading = true
+    })
+    .addCase(getSingleCoupon.fulfilled, (state, { payload }) => {
+      state.loading = false
+      state.singleCoupon = payload
+      state.error = false
+    })
+    .addCase(getSingleCoupon.rejected, (state, { payload }) => {
+      state.loading = false;
+      state.error = true;
+      state.message =
+        payload !== undefined && payload.message
+          ? payload.message
+          : 'Something went wrong. Try again later.';
+    })
+    .addCase(updateCoupon.pending, (state) => {
+      state.loading = true
+    })
+    .addCase(updateCoupon.fulfilled, (state, { payload }) => {
+      state.loading = false
+      state.message = payload
+      state.error = false
+    })
+    .addCase(updateCoupon.rejected, (state, { payload }) => {
+      state.loading = false;
+      state.error = true;
+      state.message =
+        payload !== undefined && payload.message
+          ? payload.message
+          : 'Something went wrong. Try again later.';
+    })
+    .addCase(couponActiveDeactive.pending, (state) => {
+      state.loading = true
+    })
+    .addCase(couponActiveDeactive.fulfilled, (state, { payload }) => {
+      state.loading = false
+      state.active_inactive = payload
+    })
+    .addCase(couponActiveDeactive.rejected, (state, { payload }) => {
+      state.loading = false;
+      state.error = true;
+      state.message =
+        payload !== undefined && payload.message
+          ? payload.message
+          : 'Something went wrong. Try again later.';
+    })
+    .addCase(couponValidate.pending, (state) => {
+      state.loading = true
+    })
+    .addCase(couponValidate.fulfilled, (state, { payload }) => {
+      state.loading = false
+      state.validate = payload
+      state.error = false
+    })
+    .addCase(couponValidate.rejected, (state, { payload }) => {
+      state.loading = false;
+      state.error = true;
+      state.message =
+        payload !== undefined && payload.message
+          ? payload.message
+          : 'Something went wrong. Try again later.';
+    })
       ;
   },
 });
 
-export const { message, error, isLoading } = CouponSlice.actions;
+export const { setPage, message, error, isLoading } = CouponSlice.actions;
 
 export default CouponSlice.reducer;

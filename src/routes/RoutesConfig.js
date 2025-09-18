@@ -222,7 +222,7 @@ const allRoutes = [
         element: <AddJobForm />,
       },
       {
-        path: 'edit-job',
+        path: 'edit-job/:id',
         element: <EditJobForm />,
       },
     ],
