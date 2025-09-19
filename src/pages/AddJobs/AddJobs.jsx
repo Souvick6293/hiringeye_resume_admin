@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { BsFillPlusCircleFill } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchJobs, setPage, toggleJobActivation, toggleLocalStatus } from "../../Reducer/JobSlice";
+import { fetchJobs, setPage, toggleJobActivation } from "../../Reducer/JobSlice";
 import small_logo_3 from "../../assets/imagesource/small_logo_3.png";
 
 const AddJobs = () => {
@@ -10,23 +10,18 @@ const AddJobs = () => {
   const dispatch = useDispatch();
   const { jobs, loading, pagination } = useSelector((state) => state.job);
 
+  // Fetch jobs on page load or page change
   useEffect(() => {
     dispatch(fetchJobs({ page: pagination.page, limit: pagination.limit }));
   }, [dispatch, pagination.page, pagination.limit]);
 
-  // In your component
+  // Toggle Handler (Optimistic Update)
   const handleToggleStatus = (job) => {
-    dispatch(toggleLocalStatus(job.id));
     dispatch(toggleJobActivation({
       id: job.id,
-      currentStatus: job.is_active === 1 ? 0 : 1
+      currentStatus: job.status === 1 ? 0 : 1
     }));
   };
-
-
-
-
-
 
   return (
     <div className="pb-10">
@@ -70,7 +65,7 @@ const AddJobs = () => {
               </h3>
 
               <div
-                className="text-[#6C6C6C] text-[16px] pb-4 prose"
+                className="text-[#6C6C6C] text-[14px] pb-4 prose"
                 dangerouslySetInnerHTML={{ __html: job.job_description }}
               />
 
@@ -78,26 +73,23 @@ const AddJobs = () => {
               <label className="inline-flex items-center cursor-pointer w-full justify-center mb-3">
                 <input
                   type="checkbox"
-                  checked={job.is_active === 1}
+                  checked={job.status === 1}
                   onChange={() => handleToggleStatus(job)}
                   className="sr-only peer"
                 />
                 <div
-                  className={`relative w-12 h-6 bg-gray-300 rounded-full transition-colors
-    ${job.is_active === 1 ? "bg-green-500" : "bg-gray-300"}`}
+                  className={`relative w-12 h-6 rounded-full transition-colors duration-300
+                    ${job.status === 1 ? "bg-green-500" : "bg-gray-300"}`}
                 >
                   <span
-                    className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform 
-      ${job.is_active === 1 ? "translate-x-6" : ""}`}
+                    className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300
+                      ${job.status === 1 ? "translate-x-6" : ""}`}
                   ></span>
                 </div>
                 <span className="ml-3 text-sm font-medium text-gray-700">
-                  {job.is_active === 1 ? "Active" : "Inactive"}
+                  {job.status === 1 ? "Active" : "Inactive"}
                 </span>
-
               </label>
-
-
 
               {/* Edit Button */}
               <button

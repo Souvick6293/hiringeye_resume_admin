@@ -2,20 +2,22 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../store/Api";
 
 export const planList = createAsyncThunk(
-    'planList',
+    "planList",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/admin/plan/get-plans`);
+            const response = await api.get(`api/plan-manage/list`);
+
             if (response?.data?.status_code === 200) {
                 return response?.data;
             } else {
-                return rejectWithValue(response);
+                return rejectWithValue(response?.data || response);
             }
         } catch (error) {
-            return rejectWithValue(error);
+            return rejectWithValue(error?.response?.data || error.message);
         }
     }
-)
+);
+
 
 export const planDetails = createAsyncThunk(
     'planDetails',

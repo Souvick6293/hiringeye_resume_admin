@@ -137,14 +137,6 @@ const jobSlice = createSlice({
     setLimit: (state, action) => {
       state.pagination.limit = action.payload;
     },
-    toggleLocalStatus: (state, action) => {
-      const jobId = action.payload;
-      state.jobs = state.jobs.map((job) =>
-        job.id === jobId
-          ? { ...job, is_active: job.is_active === 1 ? 0 : 1 }
-          : job
-      );
-    },
 
   },
   extraReducers: (builder) => {
@@ -236,11 +228,13 @@ const jobSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.message = payload?.message || "Job status updated!";
-        state.jobs = state.jobs.map((job) =>
-          job.id === payload.jobId ? { ...job, is_active: payload.is_active } : job
+        // Update the status in jobs array
+        state.jobs = state.jobs.map(job =>
+          job.id === payload.jobId ? { ...job, status: payload.is_active } : job
         );
+        // Optional: If you have jobDetail page open
         if (state.jobDetail && state.jobDetail.id === payload.jobId) {
-          state.jobDetail = { ...state.jobDetail, is_active: payload.is_active };
+          state.jobDetail = { ...state.jobDetail, status: payload.is_active };
         }
       })
       .addCase(toggleJobActivation.rejected, (state, { payload }) => {

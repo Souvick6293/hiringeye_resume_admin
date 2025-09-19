@@ -59,13 +59,13 @@ export const getAllCouponProduct = createAsyncThunk(
 
 )
 
-//get single coupon
+//get coupon details coupon
 
-export const getSingleCoupon = createAsyncThunk(
-  'coupon/getSingleCoupon',
+export const getCouponDetails = createAsyncThunk(
+  'coupon/getCouponDetails',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await api.post('/coupon/get-single-coupon', id);
+      const response = await api.get(`/api/coupon-manage/detail/${id}`);
       if (response?.data?.status_code === 200) {
         return response?.data;
       } else {
@@ -83,7 +83,7 @@ export const updateCoupon = createAsyncThunk(
   'coupon/updateCoupon',
   async (userInput, { rejectWithValue }) => {
     try {
-      const response = await api.post('/coupon/edit-coupon', userInput);
+      const response = await api.put('/api/coupon-manage/edit', userInput);
       if (response?.data?.status_code === 200) {
         return response?.data;
       } else {
@@ -102,7 +102,7 @@ export const couponActiveDeactive = createAsyncThunk(
   'coupon/couponActiveDeactive',
   async (userInput, { rejectWithValue }) => {
     try {
-      const response = await api.post('/coupon/active-inactive-coupon', userInput);
+      const response = await api.patch('/api/coupon-manage/activation', userInput);
       if (response?.data?.status_code === 200) {
         return response?.data;
       } else {
@@ -143,7 +143,7 @@ const initialState = {
   message: null,
   couponList: [],
   productDropDownList: [],
-  singleCoupon: {},
+  couponDetails: {},
   active_inactive: {},
   validate: "",
   pagination: {
@@ -229,15 +229,15 @@ const CouponSlice = createSlice({
           ? payload.message
           : 'Something went wrong. Try again later.';
     })
-    .addCase(getSingleCoupon.pending, (state) => {
+    .addCase(getCouponDetails.pending, (state) => {
       state.loading = true
     })
-    .addCase(getSingleCoupon.fulfilled, (state, { payload }) => {
+    .addCase(getCouponDetails.fulfilled, (state, { payload }) => {
       state.loading = false
-      state.singleCoupon = payload
+      state.couponDetails = payload
       state.error = false
     })
-    .addCase(getSingleCoupon.rejected, (state, { payload }) => {
+    .addCase(getCouponDetails.rejected, (state, { payload }) => {
       state.loading = false;
       state.error = true;
       state.message =

@@ -8,6 +8,8 @@ import { logo } from '../../assets/images/images';
 import { FaArrowLeft } from "react-icons/fa6";
 import { CgArrowLeft } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; 
+import "react-toastify/dist/ReactToastify.css"; 
 
 const AddJobForm = () => {
   const {
@@ -69,8 +71,17 @@ const AddJobForm = () => {
     } else {
       dispatch(addJob(formattedData))
         .unwrap()
-        .then((res) => console.log("Job Added Successfully", res))
-        .catch((err) => console.error("Job Add Failed", err));
+        .then((res) => {
+          toast.success(res.message || "Job Added Successfully 🎉");
+          navigate("/add-jobs"); 
+        })
+        .catch((err) => {
+          const errorMessage =
+            err?.data?.[0]?.message ||
+            err?.message ||
+            "Failed to add job!";
+          toast.error(errorMessage);
+        });
     }
   };
 

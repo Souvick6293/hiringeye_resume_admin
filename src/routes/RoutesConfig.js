@@ -37,6 +37,7 @@ import AddCoupon from '../pages/ManageCoupon/AddCoupon.jsx';
 import MyProfile from '../pages/MyProfile/MyProfile.jsx';
 import AddJobForm from '../pages/AddJobs/AddJobForm.jsx';
 import EditJobForm from '../pages/AddJobs/EditJobForm .jsx';
+import EditCoupon from '../pages/ManageCoupon/EditCoupon.jsx';
 
 
 const allRoutes = [
@@ -262,6 +263,16 @@ const allRoutes = [
     ],
   },
 
+  {
+    path: '/edit-coupon/:id',
+    element: <InsideLayout />,
+    children: [
+      {
+        index: true,
+        element: <EditCoupon />,
+      },
+    ],
+  },
 
 
   {

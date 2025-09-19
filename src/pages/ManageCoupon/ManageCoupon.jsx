@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getCouponList } from "../../Reducer/CouponSlice";
 
+
 const ManageCoupon = () => {
   const dispatch = useDispatch();
   const { couponList, loading, pagination } = useSelector((state) => state.coupon);
@@ -71,11 +72,17 @@ const ManageCoupon = () => {
                     </div>
                   </div>
 
-                  <div>
+                 <div className="flex items-center gap-4">
+                    <Link
+                      to={`/edit-coupon/${coupon.id}`}
+                      className="flex items-center gap-2 bg-[#E8E8FF] hover:bg-[#d6d6ff] text-[#4A3AFF] px-4 py-2 rounded-[30px] text-sm font-medium transition-all"
+                    >
+                      Edit
+                    </Link>
                     <button
                       className={`rounded-[30px] px-8 font-medium text-[14px] leading-[42px] cursor-pointer inline-flex justify-center items-center ${isExpired
-                          ? "bg-[#FFEBEB] text-[#FF0404] hover:text-black"
-                          : "bg-[#c3d2db] text-[#0369A1] hover:text-black"
+                        ? "bg-[#FFEBEB] text-[#FF0404] hover:text-black"
+                        : "bg-[#c3d2db] text-[#0369A1] hover:text-black"
                         }`}
                     >
                       {isExpired ? "Expired" : "Active"}

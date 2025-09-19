@@ -8,6 +8,8 @@ import { logo } from "../../assets/images/images";
 import { FaArrowLeft } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
 import { CgArrowLeft } from "react-icons/cg";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const EditJobForm = () => {
     const dispatch = useDispatch();
@@ -116,16 +118,23 @@ const EditJobForm = () => {
 
         try {
             await dispatch(editJob({ jobId: id, jobData: formattedData })).unwrap();
-            alert("Job updated successfully!");
+            toast.success("Job updated successfully!");
             navigate("/add-jobs");
         } catch (err) {
             console.error("API Error: ", err);
-            if (err?.data) {
-                err.data.forEach((fieldError) => {
+
+            // RTK Query / createAsyncThunk error handle
+            const serverErrors = err?.payload?.data || err?.data;
+
+            if (Array.isArray(serverErrors)) {
+                serverErrors.forEach((fieldError) => {
                     setError(fieldError.field, { type: "server", message: fieldError.message });
+                    toast.error(`${fieldError.field}: ${fieldError.message}`);
                 });
+            } else if (err?.payload?.message || err?.message) {
+                toast.error(err?.payload?.message || err.message);
             } else {
-                alert(err?.message || "Something went wrong while updating the job");
+                toast.error("Something went wrong while updating the job");
             }
         }
     };
@@ -161,10 +170,10 @@ const EditJobForm = () => {
                                 <div key={step} className="flex flex-col items-center mb-6">
                                     <div
                                         className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold border-2 ${isCompleted
-                                                ? "bg-purple-600 text-white border-purple-600"
-                                                : isActive
-                                                    ? "border-purple-600 text-purple-600"
-                                                    : "border-gray-300 text-gray-400"
+                                            ? "bg-purple-600 text-white border-purple-600"
+                                            : isActive
+                                                ? "border-purple-600 text-purple-600"
+                                                : "border-gray-300 text-gray-400"
                                             }`}
                                     >
                                         {stepNumber}
