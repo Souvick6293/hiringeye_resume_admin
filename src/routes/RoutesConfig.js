@@ -38,6 +38,7 @@ import MyProfile from '../pages/MyProfile/MyProfile.jsx';
 import AddJobForm from '../pages/AddJobs/AddJobForm.jsx';
 import EditJobForm from '../pages/AddJobs/EditJobForm .jsx';
 import EditCoupon from '../pages/ManageCoupon/EditCoupon.jsx';
+import Overview from '../pages/Overview/Overview.jsx';
 
 
 const allRoutes = [
@@ -71,6 +72,16 @@ const allRoutes = [
     children: [
       { index: true, element: <Register /> },
       { path: 'register', element: <Register /> },
+    ],
+  },
+    {
+    path: '/overview',
+    element: <InsideLayout />,
+    children: [
+      {
+        index: true,
+        element: <Overview />,
+      },
     ],
   },
   {

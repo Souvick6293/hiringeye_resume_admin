@@ -1,22 +1,62 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../store/Api";
+import axios from "axios";
 
-export const planList = createAsyncThunk(
-    "planList",
+export const getIpData = createAsyncThunk(
+    "plan/getIpData",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get(`api/plan-manage/list`);
-
-            if (response?.data?.status_code === 200) {
-                return response?.data;
+            const response = await axios.get("https://api.ipify.org?format=json");
+            if (response?.data?.ip) {
+                return response.data.ip;
             } else {
-                return rejectWithValue(response?.data || response);
+                return rejectWithValue("Invalid response format");
             }
-        } catch (error) {
-            return rejectWithValue(error?.response?.data || error.message);
+        } catch (err) {
+            if (err.response?.data) return rejectWithValue(err.response.data);
+            else if (err.message) return rejectWithValue(err.message);
+            else return rejectWithValue("Failed to fetch IP address");
         }
     }
 );
+
+//  Fetch Plan List with IP
+export const planList = createAsyncThunk(
+  "plan/planList",
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      const ipAddress = await dispatch(getIpData()).unwrap();
+      const flags = ["one_time", "quarterly", "annually"];
+
+      const allPlans = [];
+
+      for (const flag of flags) {
+        const url = `/api/plan-manage/list?flag=${flag}&ipAddress=${ipAddress}`;
+        console.log("Plan URL:", url);
+
+        const response = await api.get(url);
+
+        if (response?.data?.status_code === 200) {
+          allPlans.push(...response.data.data);
+        } else {
+          return rejectWithValue(response?.data || response);
+        }
+      }
+
+      return { data: allPlans };
+    } catch (error) {
+      return rejectWithValue(error?.response?.data || error.message);
+    }
+  }
+);
+
+
+
+
+
+
+
+
 
 
 export const planDetails = createAsyncThunk(
@@ -223,6 +263,7 @@ const initialState = {
     loading: false,
     error: false,
     message: "",
+    ipAddress: "",
     planListData: {},
     planDetailsData: {},
     loadingUpdatePlan: false,
@@ -246,7 +287,21 @@ const PlanSlice = createSlice(
         reducers: {},
         extraReducers: (builder) => {
             builder
-
+                .addCase(getIpData.pending, (state) => {
+                    state.loading = true;
+                    state.error = false;
+                })
+                .addCase(getIpData.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.ipAddress = payload;
+                    state.error = false;
+                })
+                .addCase(getIpData.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = true;
+                    state.message =
+                        payload && payload.message ? payload.message : "Failed to fetch IP";
+                })
                 .addCase(planList.pending, (state) => {
                     state.loading = true
                 })

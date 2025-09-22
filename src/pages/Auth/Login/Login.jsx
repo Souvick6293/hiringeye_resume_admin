@@ -64,7 +64,7 @@ const Login = () => {
             Cookies.remove("username");
             Cookies.remove("password");
           }
-          navigate("/dashboard");
+          navigate("/overview");
         }
       } else if (res?.payload?.status_code === 400) {
         setErrorMessage(res?.payload?.message);

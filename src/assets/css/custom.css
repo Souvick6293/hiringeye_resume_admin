@@ -1389,7 +1389,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   }
 }
 
-.gold_card_box :hover {
+.gold_card_box{
   background: url(../imagesource/business_bg.png) no-repeat center top;
   background-size: cover;
   overflow: hidden;

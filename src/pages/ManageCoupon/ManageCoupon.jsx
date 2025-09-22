@@ -10,6 +10,7 @@ const ManageCoupon = () => {
   const dispatch = useDispatch();
   const { couponList, loading, pagination } = useSelector((state) => state.coupon);
 
+
   useEffect(() => {
     dispatch(getCouponList({ page: 1, limit: 10 }));
   }, [dispatch]);
@@ -58,8 +59,8 @@ const ManageCoupon = () => {
                         <ul className="flex items-center">
                           <li className="text-[#7D7D7D] text-[14px] font-normal pr-8">
                             {coupon.coupon_type === 1
-                              ? `${coupon.coupon_ammount}% off`
-                              : `$${coupon.coupon_ammount} off`}
+                              ? `${parseFloat(coupon.coupon_ammount).toString().replace(/\.00$/, '')}% off`
+                              : `$${parseFloat(coupon.coupon_ammount).toFixed(2)} off`}
                           </li>
                           <li className="text-[#7D7D7D] text-[14px] font-normal pr-8">
                             Valid {coupon.no_of_valid_user} uses
@@ -72,7 +73,7 @@ const ManageCoupon = () => {
                     </div>
                   </div>
 
-                 <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4">
                     <Link
                       to={`/edit-coupon/${coupon.id}`}
                       className="flex items-center gap-2 bg-[#E8E8FF] hover:bg-[#d6d6ff] text-[#4A3AFF] px-4 py-2 rounded-[30px] text-sm font-medium transition-all"

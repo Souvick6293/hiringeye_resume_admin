@@ -17,6 +17,7 @@ const EditJobForm = () => {
     const { id } = useParams();
     const { jobDetail, loading } = useSelector((state) => state.job);
     const [currentStep, setCurrentStep] = useState(1);
+    console.log('jobDetail',jobDetail)
 
     const {
         register,
