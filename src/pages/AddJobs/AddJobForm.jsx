@@ -51,8 +51,8 @@ const AddJobForm = () => {
     };
 
     // Take the first selected company size
-    const selectedCompanySize = data.company_size?.[0];
-    const companySizeValue = selectedCompanySize ? companySizeMap[selectedCompanySize] : 0;
+   const companySizeValue = data.company_size ? companySizeMap[data.company_size] : 0;
+
 
     // Take single selected job type
     const selectedJobType = Array.isArray(data.job_type)
@@ -73,7 +73,7 @@ const AddJobForm = () => {
         .unwrap()
         .then((res) => {
           toast.success(res.message || "Job Added Successfully 🎉");
-          navigate("/add-jobs"); 
+          navigate("/resume-builder/add-jobs"); 
         })
         .catch((err) => {
           const errorMessage =

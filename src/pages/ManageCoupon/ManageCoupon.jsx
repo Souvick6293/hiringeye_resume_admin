@@ -25,7 +25,7 @@ const ManageCoupon = () => {
           </h3>
           <div>
             <Link
-              to="/add-coupon"
+              to="/resume-builder/manage-coupon/add-coupon"
               className="bg-[#F3EDFF] hover:bg-[#eddff9] rounded-[5px] px-4 text-[14px] leading-[50px] text-[#6326CB] cursor-pointer inline-flex justify-center items-center gap-1.5"
             >
               <BsFillPlusCircleFill className="text-xl" />

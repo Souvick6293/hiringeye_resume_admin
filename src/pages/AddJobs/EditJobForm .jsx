@@ -120,7 +120,7 @@ const EditJobForm = () => {
         try {
             await dispatch(editJob({ jobId: id, jobData: formattedData })).unwrap();
             toast.success("Job updated successfully!");
-            navigate("/add-jobs");
+            navigate("/resume-builder/add-jobs");
         } catch (err) {
             console.error("API Error: ", err);
 

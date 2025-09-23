@@ -240,7 +240,7 @@ const AuthSlice = createSlice(
 
                     sessionStorage.setItem(
                         'hiringeye_admin_token',
-                        JSON.stringify({ token: payload?.token })
+                        JSON.stringify({ token: payload?.access_token })
                     )
                     localStorage.setItem('user_role_id', payload?.role_id)
                     localStorage.setItem("user_short_name", payload?.role_short_name)

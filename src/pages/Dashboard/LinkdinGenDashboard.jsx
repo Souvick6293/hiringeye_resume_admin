@@ -5,9 +5,8 @@ import { user01 } from "../../assets/images/images.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { dashboardInfo } from "../../Reducer/DashBoardSlice.js";
-import ResumeGraph from "../../components/graph/ResumeGraph.jsx";
 
-const Dashboard = () => {
+const LinkdinGenDashboard = () => {
     const { infoData } = useSelector((state) => state?.dash);
     const dispatch = useDispatch();
 
@@ -115,10 +114,9 @@ const Dashboard = () => {
 
                 <div className="flex gap-4">
                     <div className="w-8/12 bg-white rounded-[12px] px-6 py-6">
-                        <ResumeGraph/>
-                        {/* <h3 className="text-[#252733] text-[20px] font-medium mb-5">
+                        <h3 className="text-[#252733] text-[20px] font-medium mb-5">
                             Resumes Created
-                        </h3> */}
+                        </h3>
                     </div>
                     <div className="w-4/12 bg-white rounded-[12px] px-6 py-6">
                         <h3 className="text-[#252733] text-[20px] font-medium mb-5">
@@ -159,4 +157,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default LinkdinGenDashboard;

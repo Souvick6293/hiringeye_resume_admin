@@ -39,6 +39,8 @@ import AddJobForm from '../pages/AddJobs/AddJobForm.jsx';
 import EditJobForm from '../pages/AddJobs/EditJobForm .jsx';
 import EditCoupon from '../pages/ManageCoupon/EditCoupon.jsx';
 import Overview from '../pages/Overview/Overview.jsx';
+import LinkdinGenDashboard from '../pages/Dashboard/LinkdinGenDashboard.jsx';
+import LinkdinGenManageUsers from '../pages/ManageUsers/LinkdinGenManageUsers.jsx';
 
 
 const allRoutes = [
@@ -85,12 +87,22 @@ const allRoutes = [
     ],
   },
   {
-    path: '/dashboard',
+    path: '/resume-builder/dashboard',
     element: <InsideLayout />,
     children: [
       {
         index: true,
         element: <Dashboard />,
+      },
+    ],
+  },
+  {
+    path: '/linkedin-generator/dashboard',
+    element: <InsideLayout />,
+    children: [
+      {
+        index: true,
+        element: <LinkdinGenDashboard />,
       },
     ],
   },
@@ -125,7 +137,7 @@ const allRoutes = [
     ],
   },
   {
-    path: '/manage-plans',
+    path: '/resume-builder/manage-plans',
     element: <InsideLayout />,
     children: [
       {
@@ -222,7 +234,7 @@ const allRoutes = [
   },
 
   {
-    path: '/add-jobs',
+    path: '/resume-builder/add-jobs',
     element: <InsideLayout />,
     children: [
       {
@@ -253,26 +265,31 @@ const allRoutes = [
   },
 
   {
-    path: '/manage-coupon',
-    element: <InsideLayout />,
-    children: [
-      {
-        index: true,
-        element: <ManageCoupon />,
-      },
-    ],
-  },
+  path: "/resume-builder/manage-coupon",
+  element: <InsideLayout />,
+  children: [
+    {
+      index: true,
+      element: <ManageCoupon />,
+    },
+    {
+      path: "add-coupon",
+      element: <AddCoupon />,
+    },
+  ],
+},
 
-  {
-    path: '/add-coupon',
-    element: <InsideLayout />,
-    children: [
-      {
-        index: true,
-        element: <AddCoupon />,
-      },
-    ],
-  },
+
+  // {
+  //   path: '/add-coupon',
+  //   element: <InsideLayout />,
+  //   children: [
+  //     {
+  //       index: true,
+  //       element: <AddCoupon />,
+  //     },
+  //   ],
+  // },
 
   {
     path: '/edit-coupon/:id',
@@ -308,12 +325,22 @@ const allRoutes = [
     ],
   },
   {
-    path: '/manage-user',
+    path: '/resume-builder/manage-user',
     element: <InsideLayout />,
     children: [
       {
         index: true,
         element: <ManageUsers />,
+      },
+    ],
+  },
+  {
+    path: 'linkedin-generator/manage-user',
+    element: <InsideLayout />,
+    children: [
+      {
+        index: true,
+        element: <LinkdinGenManageUsers />,
       },
     ],
   },

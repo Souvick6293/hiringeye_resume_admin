@@ -34,6 +34,7 @@ import RoleSlice from '../Reducer/RoleSlice';
 import UserSlice from '../Reducer/UserSlice';
 import AddAudioSlice from '../Reducer/AddAudioSlice'
 import JobSlice from '../Reducer/JobSlice'
+import  ResumeGraphSlice  from '../Reducer/ResumeGraphSlice';
 
 const store = configureStore({
   reducer: {
@@ -72,6 +73,7 @@ const store = configureStore({
     user: UserSlice,
     audios: AddAudioSlice,
     job: JobSlice,
+    resumeGraph: ResumeGraphSlice,
   },
   devTools: import.meta.env.DEV,
 });
