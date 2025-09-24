@@ -1,25 +1,25 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../store/Api";
+import serverApi from "../store/ServerApi";
 
 export const getUsers = createAsyncThunk(
-    'getUsers',
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await api.get('/api/user-mange/list');
-            if (response?.data?.status_code === 200) {
-                return response.data;
-            } else {
-                if (response?.data?.errors) {
-                    return rejectWithValue(response.data.errors);
-                } else {
-                    return rejectWithValue('Something went wrong.');
-                }
-            }
-        } catch (err) {
-            return rejectWithValue(err);
-        }
+  "getUsers",
+  async (searchQuery = "", { rejectWithValue }) => {
+    try {
+      const response = await api.get(
+        `/api/user-mange/list?searchQuery=${encodeURIComponent(searchQuery)}`
+      );
+      if (response?.data?.status_code === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(response?.data?.errors || "Something went wrong.");
+      }
+    } catch (err) {
+      return rejectWithValue(err);
     }
-)
+  }
+);
+
 // export const getUsers = createAsyncThunk(
 //     'getUsers',
 //     async (searchQuery = '', { rejectWithValue }) => {
@@ -42,24 +42,30 @@ export const getUsers = createAsyncThunk(
 // );
 
 export const userActiveDeactive = createAsyncThunk(
-    'userActiveDeactive',
-    async (user_input, { rejectWithValue }) => {
-        try {
-            const response = await api.get(`/user/status/${user_input}`);
-            if (response?.data?.status_code === 200) {
-                return response.data;
-            } else {
-                if (response?.data?.errors) {
-                    return rejectWithValue(response.data.errors);
-                } else {
-                    return rejectWithValue('Something went wrong.');
-                }
-            }
-        } catch (err) {
-            return rejectWithValue(err);
-        }
+  "userActiveDeactive",
+  async (user_id, { rejectWithValue }) => {
+    try {
+      console.log("Toggling user:", user_id);
+
+      const response = await serverApi.patch("/api/manage-user/user-activation", {
+        user_id: user_id,
+      });
+
+      console.log("Status updated:", response.data);
+
+      if (response?.data?.status_code === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(response.data.errors || "Something went wrong.");
+      }
+    } catch (err) {
+      console.error("Toggle error:", err);
+      return rejectWithValue(err.response?.data || err.message);
     }
-)
+  }
+);
+
+
 const initialState = {
     loading: false,
     userData: [],

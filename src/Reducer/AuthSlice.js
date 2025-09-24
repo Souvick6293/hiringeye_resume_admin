@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import errorHandler from "../store/ErrorHandler";
 import { Base64, decode, encode } from "js-base64";
 import api from "../store/Api";
+import serverApi from "../store/ServerApi";
 
 
 
@@ -63,7 +64,7 @@ export const login = createAsyncThunk(
     async (userInput, { rejectWithValue }) => {
 
         try {
-            const response = await api.post('/api/auth/login', userInput);
+            const response = await serverApi.post('/api/auth/login', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {

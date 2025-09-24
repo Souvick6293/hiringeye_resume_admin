@@ -14,11 +14,11 @@ api.interceptors.request.use((req) => {
   let token = userTokenData && userTokenData.token ? userTokenData.token : null;
   // console.log("Req: ", req.url);
   req.headers['Content-Type'] = 'application/json';
-  if (req.url.includes('login')) {
-    req.baseURL = import.meta.env.VITE_LOGIN_API_URL;
-  } else {
-    req.baseURL = import.meta.env.VITE_API_BASE_URL;
-  }
+  // if (req.url.includes('login')) {
+  //   req.baseURL = import.meta.env.VITE_LOGIN_API_URL;
+  // } else {
+  //   req.baseURL = import.meta.env.VITE_API_BASE_URL;
+  // }
   if (formDataURL.includes(req.url)) {
     req.headers['Content-Type'] = 'multipart/form-data';
   }

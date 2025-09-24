@@ -8,17 +8,19 @@ import { getUsers, userActiveDeactive } from "../../Reducer/UserSlice"; // Adjus
 import { Button } from "flowbite-react";
 import { MdDelete } from "react-icons/md";
 import { BiSolidMessageSquareEdit } from "react-icons/bi";
+import { AiOutlineSearch } from "react-icons/ai";
 
 const LinkdinGenManageUsers = () => {
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state?.user);
   const [rowData, setRowData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    dispatch(getUsers());
-  }, []);
+    dispatch(getUsers(searchQuery));
+  }, [searchQuery]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (userData?.data?.length) {
       const mappedData = userData.data.map((user, index) => ({
         id: user.id,
@@ -29,7 +31,7 @@ const LinkdinGenManageUsers = () => {
         organization: user.organization_name ?? "-",
         user_type: user.signup_type_id === 1 ? "Individual" : "Organization",
         status: user.is_active === 1,
-        resumes: user.resumes?.length ?? 0,
+        builded_resume: user.builded_resume,
         registration_date: new Date(user.created_at).toLocaleDateString(),
       }));
       setRowData(mappedData);
@@ -70,12 +72,6 @@ const LinkdinGenManageUsers = () => {
       filter: true,
     },
     {
-      headerName: "Country",
-      field: "country",
-      sortable: true,
-      filter: true,
-    },
-    {
       headerName: "User Type",
       field: "user_type",
       sortable: true,
@@ -87,17 +83,20 @@ const LinkdinGenManageUsers = () => {
       cellRenderer: (params) => {
         const isActive = params.value;
         return (
-          <label className="inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isActive}
-              onChange={() => handleToggleStatus(params.data.id, isActive)}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500 relative"></div>
-          </label>
+          <button
+            onClick={() => handleToggleStatus(params.data.id, isActive)}
+            className={`px-3 py-1 rounded-md text-sm font-medium bg-white border ${isActive ? "border-[#259325]" : "border-[#ff8800]"
+              }`}>
+            {isActive ? "Active" : "Inactive"}
+          </button>
         );
       },
+    },
+    {
+      headerName: "Resume Build",
+      field: "builded_resume",
+      sortable: true,
+      filter: true,
     },
     {
       headerName: "Payment Method",
@@ -151,13 +150,13 @@ const LinkdinGenManageUsers = () => {
       headerName: "Action",
       field: "details",
       cellRenderer: (params) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <div>
             <button type="button">
-              <BiSolidMessageSquareEdit size={20} color="red" />
+              <BiSolidMessageSquareEdit size={20} color="#34A0A4" />
             </button>
           </div>
-          <div className="mt-1">
+          <div>
             <button type="button">
               <MdDelete size={20} color="red" />
             </button>
@@ -174,6 +173,16 @@ const LinkdinGenManageUsers = () => {
         <div className="h-full lg:h-screen">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold">User Details</h2>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search Name"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="border rounded p-2 pr-10 w-72"
+              />
+              <AiOutlineSearch className="absolute top-2.5 right-3 text-gray-500" size={20} />
+            </div>
           </div>
           <div
             className="ag-theme-alpine"

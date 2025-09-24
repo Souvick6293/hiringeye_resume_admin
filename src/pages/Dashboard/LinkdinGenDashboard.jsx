@@ -124,7 +124,7 @@ const LinkdinGenDashboard = () => {
                         </h3>
                         <div>
                             {infoData?.data?.users_list?.length > 0 ? (
-                                infoData.data.users_list.map((user) => (
+                                infoData.data.users_list.slice(-10).map((user) => (
                                     <div
                                         key={user.id}
                                         className="flex items-center gap-3 mb-5 border-b border-gray-100 pb-3"
