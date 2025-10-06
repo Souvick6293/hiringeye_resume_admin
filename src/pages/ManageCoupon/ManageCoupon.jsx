@@ -81,7 +81,7 @@ const ManageCoupon = () => {
                       Edit
                     </Link>
                     <button
-                      className={`rounded-[30px] px-8 font-medium text-[14px] leading-[42px] cursor-pointer inline-flex justify-center items-center ${isExpired
+                      className={`rounded-[30px] px-8 font-medium text-[14px] leading-[42px]  cursor-default inline-flex justify-center items-center ${isExpired
                         ? "bg-[#FFEBEB] text-[#FF0404] hover:text-black"
                         : "bg-[#c3d2db] text-[#0369A1] hover:text-black"
                         }`}

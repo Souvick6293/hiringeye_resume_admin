@@ -56,6 +56,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     setSidebarOpen(true);
   }, []);
 
+  useEffect(() => {
+    if (pathname.includes("/resume-builder")) {
+      setActiveTab("resume");
+      setShowTabs(false);
+    } else if (pathname.includes("/linkedin-generator")) {
+      setActiveTab("linkedin");
+      setShowTabs(false);
+    } else if (pathname.includes("/overview")) {
+      setActiveTab("overview");
+      setShowTabs(true);
+    }
+  }, [pathname]);
+
   const onHoverOpenSidebar = () => setSidebarOpen(false);
 
   const currentUserRole = userRoles();

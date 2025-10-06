@@ -149,7 +149,7 @@ const Overview = () => {
                         {/* Resume Builder Card */}
                         <div className="border border-[#D9D9D9] rounded-lg p-4 mb-4">
                             <div className="flex items-center gap-3 mb-2">
-                               <div className="basis-[20%] bg-[#2b7fff] w-[50px] h-[50px] flex items-center justify-center rounded-md">
+                                <div className="basis-[20%] bg-[#2b7fff] w-[50px] h-[50px] flex items-center justify-center rounded-md">
                                     <CgFileDocument className="text-[#fff] text-2xl" />
                                 </div>
                                 <div className="basis-[80%]">
@@ -183,12 +183,12 @@ const Overview = () => {
                         {/* LinkedIn Generator Card */}
                         <div className="border border-[#D9D9D9] rounded-lg p-4 mb-4">
                             <div className="flex items-center gap-3 mb-2">
-                               <div className="basis-[20%] bg-[#ad46ff] w-[50px] h-[50px] flex items-center justify-center rounded-md">
+                                <div className="basis-[20%] bg-[#ad46ff] w-[50px] h-[50px] flex items-center justify-center rounded-md">
                                     <LiaLinkedinIn className="text-[#fff] text-2xl" />
                                 </div>
                                 <div className="basis-[80%]">
                                     <h4 className="text-[#252733] font-medium text-lg">
-                                       LinkedIn Content Generator
+                                        LinkedIn Content Generator
                                     </h4>
                                     <p className="text-[#929292] text-sm">
                                         1178 resumes this month
@@ -215,14 +215,14 @@ const Overview = () => {
                         </div>
 
                         {/* LinkedIn Comment Card */}
-                         <div className="border border-[#D9D9D9] rounded-lg p-4 mb-4">
+                        <div className="border border-[#D9D9D9] rounded-lg p-4 mb-4">
                             <div className="flex items-center gap-3 mb-2">
-                               <div className="basis-[20%] bg-[#ad46ff] w-[50px] h-[50px] flex items-center justify-center rounded-md">
+                                <div className="basis-[20%] bg-[#ad46ff] w-[50px] h-[50px] flex items-center justify-center rounded-md">
                                     <LiaLinkedinIn className="text-[#fff] text-2xl" />
                                 </div>
                                 <div className="basis-[80%]">
                                     <h4 className="text-[#252733] font-medium text-lg">
-                                       LinkedIn Content Generator
+                                        LinkedIn Content Generator
                                     </h4>
                                     <p className="text-[#929292] text-sm">
                                         1178 resumes this month
@@ -257,28 +257,30 @@ const Overview = () => {
                         </h3>
                         <div>
                             {infoData?.data?.users_list?.length > 0 ? (
-                                infoData.data.users_list.map((user) => (
-                                    <div
-                                        key={user.id}
-                                        className="flex items-center gap-3 mb-5 border-b border-gray-100 pb-3"
-                                    >
-                                        <div className="w-[56px] h-[56px] rounded-full bg-gray-100 flex items-center justify-center">
-                                            <img
-                                                src={user.avatar ?? user01}
-                                                alt={user.fullname}
-                                                className="w-full h-full object-cover"
-                                            />
+                                infoData.data.users_list
+                                    .slice(-10)
+                                    .map((user) => (
+                                        <div
+                                            key={user.id}
+                                            className="flex items-center gap-3 mb-5 border-b border-gray-100 pb-3"
+                                        >
+                                            <div className="w-[56px] h-[56px] rounded-full bg-gray-100 flex items-center justify-center">
+                                                <img
+                                                    src={user.avatar ?? user01}
+                                                    alt={user.fullname}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <div>
+                                                <p className="text-[#252733] text-base font-medium">
+                                                    {user.fullname}
+                                                </p>
+                                                <p className="text-[#929292] text-[13px] font-medium">
+                                                    {user.email}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-[#252733] text-base font-medium">
-                                                {user.fullname}
-                                            </p>
-                                            <p className="text-[#929292] text-[13px] font-medium">
-                                                {user.email}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))
+                                    ))
                             ) : (
                                 <p className="text-[#929292] text-sm">No users found.</p>
                             )}
@@ -290,28 +292,30 @@ const Overview = () => {
                         </h3>
                         <div>
                             {infoData?.data?.users_list?.length > 0 ? (
-                                infoData.data.users_list.map((user) => (
-                                    <div
-                                        key={user.id}
-                                        className="flex items-center gap-3 mb-5 border-b border-gray-100 pb-3"
-                                    >
-                                        <div className="w-[56px] h-[56px] rounded-full bg-gray-100 flex items-center justify-center">
-                                            <img
-                                                src={user.avatar ?? user01}
-                                                alt={user.fullname}
-                                                className="w-full h-full object-cover"
-                                            />
+                                infoData.data.users_list
+                                    .slice(-10)
+                                    .map((user) => (
+                                        <div
+                                            key={user.id}
+                                            className="flex items-center gap-3 mb-5 border-b border-gray-100 pb-3"
+                                        >
+                                            <div className="w-[56px] h-[56px] rounded-full bg-gray-100 flex items-center justify-center">
+                                                <img
+                                                    src={user.avatar ?? user01}
+                                                    alt={user.fullname}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <div>
+                                                <p className="text-[#252733] text-base font-medium">
+                                                    {user.fullname}
+                                                </p>
+                                                <p className="text-[#929292] text-[13px] font-medium">
+                                                    {user.email}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-[#252733] text-base font-medium">
-                                                {user.fullname}
-                                            </p>
-                                            <p className="text-[#929292] text-[13px] font-medium">
-                                                {user.email}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))
+                                    ))
                             ) : (
                                 <p className="text-[#929292] text-sm">No users found.</p>
                             )}

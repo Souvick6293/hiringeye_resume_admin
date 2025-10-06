@@ -82,7 +82,7 @@ const EditCoupon = () => {
         <div className="bg-white rounded-[10px] p-8">
             <div className="mb-4 flex items-center justify-between">
                 <div>
-                    <Link to="/manage-coupon" className="flex items-center gap-2">
+                    <Link to="/resume-builder/manage-coupon" className="flex items-center gap-2">
                         <span className="border border-[#A6A6A6] w-[34px] h-[34px] rounded-[5px] flex items-center justify-center">
                             <CgArrowLeft />
                         </span>
