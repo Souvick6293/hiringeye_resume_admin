@@ -11,9 +11,11 @@ import { HiArrowTrendingUp } from "react-icons/hi2";
 import { LiaLinkedinIn } from "react-icons/lia";
 import { BsPostcardFill } from "react-icons/bs";
 import { BiSolidCommentDetail } from "react-icons/bi";
+import { linkdinDashboardInfo } from "../../Reducer/LinkdinDashboardSlice.js";
 
 const Overview = () => {
     const { infoData } = useSelector((state) => state?.dash);
+    const { linkdinInfoData } = useSelector((state) => state?.linkdinDashboard);
     const dispatch = useDispatch();
 
     const [userCount, setUserCount] = useState(0);
@@ -25,7 +27,9 @@ const Overview = () => {
 
     useEffect(() => {
         dispatch(dashboardInfo());
+        dispatch(linkdinDashboardInfo())
     }, [dispatch]);
+
 
     // smooth animation function using requestAnimationFrame
     const animateCounter = (endValue, setState, duration = 1000) => {
