@@ -12,10 +12,13 @@ import { LiaLinkedinIn } from "react-icons/lia";
 import { BsPostcardFill } from "react-icons/bs";
 import { BiSolidCommentDetail } from "react-icons/bi";
 import { linkdinDashboardInfo } from "../../Reducer/LinkdinDashboardSlice.js";
+import CombinedGraph from "../../components/graph/CombinedGraph.jsx";
+import { fetchLinkdinGraph } from "../../Reducer/LinkdinGraphSlice.js";
 
 const Overview = () => {
     const { infoData } = useSelector((state) => state?.dash);
     const { linkdinInfoData } = useSelector((state) => state?.linkdinDashboard);
+    const { graphData } = useSelector((state) => state.linkdinGraph);
     const dispatch = useDispatch();
 
     const [userCount, setUserCount] = useState(0);
@@ -25,11 +28,15 @@ const Overview = () => {
     const [linkdinPostCount, setLinkDinPostCount] = useState(0);
     const [linkdinCommentCount, setLinkdinCommentCount] = useState(0);
 
+    // New separate counters
+    const [resumeUserCount, setResumeUserCount] = useState(0);
+    const [linkedinUserCount, setLinkedinUserCount] = useState(0);
+
     useEffect(() => {
         dispatch(dashboardInfo());
-        dispatch(linkdinDashboardInfo())
+        dispatch(linkdinDashboardInfo());
+        dispatch(fetchLinkdinGraph());
     }, [dispatch]);
-
 
     // smooth animation function using requestAnimationFrame
     const animateCounter = (endValue, setState, duration = 1000) => {
@@ -51,15 +58,23 @@ const Overview = () => {
     };
 
     useEffect(() => {
-        if (infoData?.data) {
-            animateCounter(infoData.data.totalUsers ?? 0, setUserCount);
+        if (infoData?.data && linkdinInfoData?.data) {
+            // Top total counters
+            animateCounter(
+                (infoData.data.totalUsers ?? 0) + (linkdinInfoData.data.totalUsers ?? 0),
+                setUserCount
+            );
             animateCounter(infoData.data.totalActiveSubscription ?? 0, setSubscriptionCount);
             animateCounter(infoData.data.total_resume_created ?? 0, setResumeCount);
             animateCounter(36000, setRevenueCount);
-            animateCounter(1236, setLinkDinPostCount);
-            animateCounter(1106, setLinkdinCommentCount);
+            animateCounter(graphData.totalPost ?? 0, setLinkDinPostCount);
+            animateCounter(graphData.totalComment ?? 0, setLinkdinCommentCount);
+
+            // Product-wise counters
+            animateCounter(infoData.data.totalUsers ?? 0, setResumeUserCount);
+            animateCounter(linkdinInfoData.data.totalUsers ?? 0, setLinkedinUserCount);
         }
-    }, [infoData]);
+    }, [infoData, linkdinInfoData, graphData]);
 
     return (
         <div className="wrapper_area my-0 mx-auto px-0">
@@ -141,10 +156,9 @@ const Overview = () => {
 
                 <div className="flex gap-4">
                     <div className="w-8/12 bg-white rounded-[12px] px-6 py-6">
-                        <h3 className="text-[#252733] text-[20px] font-medium mb-5">
-                            Platform Usage Overview
-                        </h3>
+                        <CombinedGraph />
                     </div>
+
                     <div className="w-4/12 bg-white rounded-[12px] px-6 py-6">
                         <h3 className="text-[#252733] text-[20px] font-medium mb-5">
                             Product Performance
@@ -172,7 +186,7 @@ const Overview = () => {
                                         <TbUsers className="text-lg" />
                                         Active Users
                                     </span>
-                                    <span className="text-[#252733] text-xl">{userCount}</span>
+                                    <span className="text-[#252733] text-xl">{resumeUserCount}</span>
                                 </div>
                                 <div className="flex flex-col items-center">
                                     <span className="text-[#8e8e8e] text-sm flex items-center gap-1">
@@ -206,41 +220,7 @@ const Overview = () => {
                                         <TbUsers className="text-lg" />
                                         Active Users
                                     </span>
-                                    <span className="text-[#252733] text-xl">1,236</span>
-                                </div>
-                                <div className="flex flex-col items-center">
-                                    <span className="text-[#8e8e8e] text-sm flex items-center gap-1">
-                                        <HiArrowTrendingUp className="text-lg" />
-                                        Revenue
-                                    </span>
-                                    <span className="text-[#252733] text-xl">$ {revenueCount}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* LinkedIn Comment Card */}
-                        <div className="border border-[#D9D9D9] rounded-lg p-4 mb-4">
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="basis-[20%] bg-[#ad46ff] w-[50px] h-[50px] flex items-center justify-center rounded-md">
-                                    <LiaLinkedinIn className="text-[#fff] text-2xl" />
-                                </div>
-                                <div className="basis-[80%]">
-                                    <h4 className="text-[#252733] font-medium text-lg">
-                                        LinkedIn Content Generator
-                                    </h4>
-                                    <p className="text-[#929292] text-sm">
-                                        1178 resumes this month
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex justify-between mt-4">
-                                <div className="flex flex-col items-center">
-                                    <span className="text-[#8e8e8e] text-sm flex items-center gap-1">
-                                        <TbUsers className="text-lg" />
-                                        Active Users
-                                    </span>
-                                    <span className="text-[#252733] text-xl">1,236</span>
+                                    <span className="text-[#252733] text-xl">{linkedinUserCount}</span>
                                 </div>
                                 <div className="flex flex-col items-center">
                                     <span className="text-[#8e8e8e] text-sm flex items-center gap-1">
@@ -252,14 +232,14 @@ const Overview = () => {
                             </div>
                         </div>
                     </div>
-
                 </div>
+
                 <div className="flex gap-4">
                     <div className="w-6/12 bg-white rounded-[12px] px-6 py-6">
                         <h3 className="text-[#252733] text-[20px] font-medium mb-5">
                             Resume Builder Users List
                         </h3>
-                        <div>
+                        <div className="overflow-y-auto pr-2" style={{ maxHeight: "400px" }}>
                             {infoData?.data?.users_list?.length > 0 ? (
                                 infoData.data.users_list
                                     .slice(-10)
@@ -290,13 +270,14 @@ const Overview = () => {
                             )}
                         </div>
                     </div>
+
                     <div className="w-6/12 bg-white rounded-[12px] px-6 py-6">
                         <h3 className="text-[#252733] text-[20px] font-medium mb-5">
                             LinkedIn Content Generator Users List
                         </h3>
-                        <div>
-                            {infoData?.data?.users_list?.length > 0 ? (
-                                infoData.data.users_list
+                        <div className="overflow-y-auto pr-2" style={{ maxHeight: "400px" }}>
+                            {linkdinInfoData?.data?.users_list?.length > 0 ? (
+                                linkdinInfoData.data.users_list
                                     .slice(-10)
                                     .map((user) => (
                                         <div

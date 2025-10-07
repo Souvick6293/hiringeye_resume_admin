@@ -124,7 +124,7 @@ const Dashboard = () => {
                         <h3 className="text-[#252733] text-[20px] font-medium mb-5">
                             Users List
                         </h3>
-                        <div>
+                       <div className="overflow-y-auto pr-2" style={{ maxHeight: "400px" }}>
                             {infoData?.data?.users_list?.length > 0 ? (
                                 infoData.data.users_list.slice(-10).map((user) => (
                                     <div

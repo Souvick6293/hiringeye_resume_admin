@@ -45,7 +45,7 @@ const LinkdinGenDashboard = () => {
         if (linkdinInfoData?.data) {
             animateCounter(linkdinInfoData.data.totalUsers ?? 0, setUserCount);
             animateCounter(linkdinInfoData.data.totalActiveSubscription ?? 0, setSubscriptionCount);
-            animateCounter(linkdinInfoData.data.total_resume_created ?? 0, setResumeCount);
+            animateCounter(linkdinInfoData.data.total_post_count ?? 0, setResumeCount);
             animateCounter(36000, setRevenueCount);
         }
     }, [linkdinInfoData]);
@@ -126,7 +126,7 @@ const LinkdinGenDashboard = () => {
                         <h3 className="text-[#252733] text-[20px] font-medium mb-5">
                             Users List
                         </h3>
-                        <div>
+                       <div className="overflow-y-auto pr-2" style={{ maxHeight: "400px" }}>
                             {linkdinInfoData?.data?.users_list?.length > 0 ? (
                                 linkdinInfoData.data.users_list.slice(-10).map((user) => (
                                     <div
